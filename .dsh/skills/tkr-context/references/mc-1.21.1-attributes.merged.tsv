@@ -1,0 +1,32 @@
+id	en_name	zh_name	简介	default	range	desc_en	desc_zh	translation_key	来源
+generic.armor	Armor	护甲值	降低绝大多数来源造成的伤害。每点护甲按伤害值分段减伤，收益递减；受盔甲韧性影响，高伤害攻击会削弱护甲效果。	0.0	0.0~30.0			attribute.name.generic.armor	jar 提取；简介为手工撰写
+generic.armor_toughness	Armor Toughness	盔甲韧性	降低「高伤害攻击削弱护甲」的程度。原版从不给实体赋非默认值，是 mod 常改项。	0.0	0.0~20.0			attribute.name.generic.armor_toughness	jar 提取；简介为手工撰写
+generic.attack_damage	Attack Damage	攻击伤害	近战攻击的基础伤害。玩家实际值由手持物品的武器组件决定，此默认值生效于无武器实体。	2.0	0.0~2048.0			attribute.name.generic.attack_damage	jar 提取；简介为手工撰写
+generic.attack_knockback	Attack Knockback	击退	攻击命中时施加的额外击退强度，主要供横扫与特定武器使用。	0.0	0.0~5.0			attribute.name.generic.attack_knockback	jar 提取；简介为手工撰写
+generic.attack_speed	Attack Speed	攻击速度	每秒攻击次数。数值越高攻击冷却越快，HUD 上的攻击条长度即由此换算。	4.0	0.0~1024.0			attribute.name.generic.attack_speed	jar 提取；简介为手工撰写
+player.block_break_speed	Block Break Speed	方块破坏速度	方块破坏速度倍率。1.0 为原版基准，工具效率与挖掘速度在此之上叠加。	1.0	0.0~1024.0			attribute.name.player.block_break_speed	jar 提取；简介为手工撰写
+player.block_interaction_range	Block Interaction Range	方块交互距离	可触及/交互方块的最大距离（原版生存为 4.5）。创造模式会另加距离。	4.5	0.0~64.0			attribute.name.player.block_interaction_range	jar 提取；简介为手工撰写
+generic.burning_time	Burning Time	着火时间	被点燃后的燃烧时长倍率。1.0 为原版基准，大于 1 会烧更久。原版不显式赋非默认值，是 mod 常改项。	1.0	0.0~1024.0			attribute.name.generic.burning_time	jar 提取；简介为手工撰写
+generic.explosion_knockback_resistance	Explosion Knockback Resistance	爆炸击退抗性	对爆炸击退的抗性。与普通击退抗性分开计算，原版不显式赋值，属 mod 常用属性。	0.0	0.0~1.0			attribute.name.generic.explosion_knockback_resistance	jar 提取；简介为手工撰写
+player.entity_interaction_range	Entity Interaction Range	实体交互距离	可攻击/交互实体的最大距离（原版生存为 3.0）。影响攻击判定与部分交互。	3.0	0.0~64.0			attribute.name.player.entity_interaction_range	jar 提取；简介为手工撰写
+generic.fall_damage_multiplier	Fall Damage Multiplier	摔落伤害倍数	摔落伤害倍率。低于 1 减伤，高于 1 增伤；与安全摔落高度配合决定总摔落伤害。	1.0	0.0~100.0			attribute.name.generic.fall_damage_multiplier	jar 提取；简介为手工撰写
+generic.flying_speed	Flying Speed	飞行速度	飞行速度。仅对具备飞行能力的实体（如鹦鹉螺/特定坐骑）生效，非玩家创造飞行。	0.4	0.0~1024.0			attribute.name.generic.flying_speed	jar 提取；简介为手工撰写
+generic.follow_range	Mob Follow Range	生物跟随距离	生物发现目标的索敌距离。是 AI 目标选择的判定半径，不是视野。	32.0	0.0~2048.0			attribute.name.generic.follow_range	jar 提取；简介为手工撰写
+generic.gravity	Gravity	重力	每 tick 的重力加速度。原版不显式赋非默认值，改它可做轻重力/悬浮效果。	0.08	-1.0~1.0			attribute.name.generic.gravity	jar 提取；简介为手工撰写
+generic.jump_strength	Jump Strength	跳跃力度	跳跃初速度。原版曾是马匹专用（旧键 attribute.name.horse.jump_strength 作为孤儿键仍留在语言文件中）。	0.42	0.0~32.0			attribute.name.generic.jump_strength	jar 提取；简介为手工撰写
+generic.knockback_resistance	Knockback Resistance	击退抗性	抵抗被击退的比例（0~1）。NeoForge 中为 PercentageAttribute，tooltip 按百分比显示，数值与范围同原版。	0.0	0.0~1.0			attribute.name.generic.knockback_resistance	jar 提取；简介为手工撰写
+generic.luck	Luck	幸运值	影响战利品表与钓鱼的品质判定，即「幸运」效果所改的属性。	0.0	-1024.0~1024.0			attribute.name.generic.luck	jar 提取；简介为手工撰写
+generic.max_absorption	Max Absorption	最大伤害吸收值	伤害吸收（金心）的上限。原版不显式赋非默认值，是 mod 常改项。	0.0	0.0~2048.0			attribute.name.generic.max_absorption	jar 提取；简介为手工撰写
+generic.max_health	Max Health	最大生命值	最大生命值，默认 20（即 10 颗心）。生命值上限的显示与判定均以此为准。	20.0	1.0~1024.0			attribute.name.generic.max_health	jar 提取；简介为手工撰写
+player.mining_efficiency	Mining Efficiency	挖掘效率	挖掘效率加成，作用于方块破坏速度。原版不显式赋非默认值，是 mod 常改项。	0.0	0.0~1024.0			attribute.name.player.mining_efficiency	jar 提取；简介为手工撰写
+generic.movement_efficiency	Movement Efficiency	移动效率	移动效率，用于抵消部分移动惩罚（如跳跃疲劳）。原版不显式赋非默认值。	0.0	0.0~1.0			attribute.name.generic.movement_efficiency	jar 提取；简介为手工撰写
+generic.movement_speed	Speed	速度	移动速度。**注意**：属性注册默认值为 0.7，但玩家实际速度由 Player.createAttributes() 覆盖为 0.1，改造此属性前务必确认目标实体。	0.7	0.0~1024.0			attribute.name.generic.movement_speed	jar 提取；简介为手工撰写
+generic.oxygen_bonus	Oxygen Bonus	额外氧气	额外氧气，延长水下憋气时间。原版不显式赋非默认值，是 mod 常改项。	0.0	0.0~1024.0			attribute.name.generic.oxygen_bonus	jar 提取；简介为手工撰写
+generic.safe_fall_distance	Safe Fall Distance	安全摔落高度	安全摔落高度，超过此高度才开始计算摔落伤害，默认 3 格。	3.0	-1024.0~1024.0			attribute.name.generic.safe_fall_distance	jar 提取；简介为手工撰写
+generic.scale	Scale	尺寸	实体尺寸缩放倍率。**陷阱**：模型/碰撞箱的缩放并不自动跟随，需自行处理渲染与判定箱。	1.0	0.0625~16.0			attribute.name.generic.scale	jar 提取；简介为手工撰写
+player.sneaking_speed	Sneaking Speed	潜行速度	潜行时的移动速度倍率，默认 0.3。	0.3	0.0~1.0			attribute.name.player.sneaking_speed	jar 提取；简介为手工撰写
+zombie.spawn_reinforcements	Zombie Reinforcements	僵尸增援	僵尸受击时召唤增援的概率（0~1）。仅对僵尸类生效。	0.0	0.0~1.0			attribute.name.zombie.spawn_reinforcements	jar 提取；简介为手工撰写
+generic.step_height	Step Height	最大行走高度	可直接迈上的最大高度，默认 0.6 格（半格台阶+）。改大可自动上整格。	0.6	0.0~10.0			attribute.name.generic.step_height	jar 提取；简介为手工撰写
+player.submerged_mining_speed	Submerged Mining Speed	水下挖掘速度	水下挖掘速度倍率，默认 0.2（即水下挖得极慢）。	0.2	0.0~20.0			attribute.name.player.submerged_mining_speed	jar 提取；简介为手工撰写
+player.sweeping_damage_ratio	Sweeping Damage Ratio	横扫伤害比率	横扫攻击对周围实体造成的伤害比例，默认 0。	0.0	0.0~1.0			attribute.name.player.sweeping_damage_ratio	jar 提取；简介为手工撰写
+generic.water_movement_efficiency	Water Movement Efficiency	水中移动效率	水中移动效率，影响水中移动速度。原版不显式赋非默认值，是 mod 常改项。	0.0	0.0~1.0			attribute.name.generic.water_movement_efficiency	jar 提取；简介为手工撰写

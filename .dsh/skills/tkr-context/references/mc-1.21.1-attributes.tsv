@@ -1,0 +1,32 @@
+﻿id	en_name	zh_name	default	range	desc_en	desc_zh	translation_key
+generic.armor	Armor	护甲值	0.0	0.0~30.0			attribute.name.generic.armor
+generic.armor_toughness	Armor Toughness	盔甲韧性	0.0	0.0~20.0			attribute.name.generic.armor_toughness
+generic.attack_damage	Attack Damage	攻击伤害	2.0	0.0~2048.0			attribute.name.generic.attack_damage
+generic.attack_knockback	Attack Knockback	击退	0.0	0.0~5.0			attribute.name.generic.attack_knockback
+generic.attack_speed	Attack Speed	攻击速度	4.0	0.0~1024.0			attribute.name.generic.attack_speed
+player.block_break_speed	Block Break Speed	方块破坏速度	1.0	0.0~1024.0			attribute.name.player.block_break_speed
+player.block_interaction_range	Block Interaction Range	方块交互距离	4.5	0.0~64.0			attribute.name.player.block_interaction_range
+generic.burning_time	Burning Time	着火时间	1.0	0.0~1024.0			attribute.name.generic.burning_time
+generic.explosion_knockback_resistance	Explosion Knockback Resistance	爆炸击退抗性	0.0	0.0~1.0			attribute.name.generic.explosion_knockback_resistance
+player.entity_interaction_range	Entity Interaction Range	实体交互距离	3.0	0.0~64.0			attribute.name.player.entity_interaction_range
+generic.fall_damage_multiplier	Fall Damage Multiplier	摔落伤害倍数	1.0	0.0~100.0			attribute.name.generic.fall_damage_multiplier
+generic.flying_speed	Flying Speed	飞行速度	0.4	0.0~1024.0			attribute.name.generic.flying_speed
+generic.follow_range	Mob Follow Range	生物跟随距离	32.0	0.0~2048.0			attribute.name.generic.follow_range
+generic.gravity	Gravity	重力	0.08	-1.0~1.0			attribute.name.generic.gravity
+generic.jump_strength	Jump Strength	跳跃力度	0.42	0.0~32.0			attribute.name.generic.jump_strength
+generic.knockback_resistance	Knockback Resistance	击退抗性	0.0	0.0~1.0			attribute.name.generic.knockback_resistance
+generic.luck	Luck	幸运值	0.0	-1024.0~1024.0			attribute.name.generic.luck
+generic.max_absorption	Max Absorption	最大伤害吸收值	0.0	0.0~2048.0			attribute.name.generic.max_absorption
+generic.max_health	Max Health	最大生命值	20.0	1.0~1024.0			attribute.name.generic.max_health
+player.mining_efficiency	Mining Efficiency	挖掘效率	0.0	0.0~1024.0			attribute.name.player.mining_efficiency
+generic.movement_efficiency	Movement Efficiency	移动效率	0.0	0.0~1.0			attribute.name.generic.movement_efficiency
+generic.movement_speed	Speed	速度	0.7	0.0~1024.0			attribute.name.generic.movement_speed
+generic.oxygen_bonus	Oxygen Bonus	额外氧气	0.0	0.0~1024.0			attribute.name.generic.oxygen_bonus
+generic.safe_fall_distance	Safe Fall Distance	安全摔落高度	3.0	-1024.0~1024.0			attribute.name.generic.safe_fall_distance
+generic.scale	Scale	尺寸	1.0	0.0625~16.0			attribute.name.generic.scale
+player.sneaking_speed	Sneaking Speed	潜行速度	0.3	0.0~1.0			attribute.name.player.sneaking_speed
+zombie.spawn_reinforcements	Zombie Reinforcements	僵尸增援	0.0	0.0~1.0			attribute.name.zombie.spawn_reinforcements
+generic.step_height	Step Height	最大行走高度	0.6	0.0~10.0			attribute.name.generic.step_height
+player.submerged_mining_speed	Submerged Mining Speed	水下挖掘速度	0.2	0.0~20.0			attribute.name.player.submerged_mining_speed
+player.sweeping_damage_ratio	Sweeping Damage Ratio	横扫伤害比率	0.0	0.0~1.0			attribute.name.player.sweeping_damage_ratio
+generic.water_movement_efficiency	Water Movement Efficiency	水中移动效率	0.0	0.0~1.0			attribute.name.generic.water_movement_efficiency
