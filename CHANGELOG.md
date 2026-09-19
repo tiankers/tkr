@@ -4,7 +4,7 @@
 
 ### 变更
 
-- 移除 Patchouli 依赖。项目现在只需要 Curios API 一个外部依赖。
+- 移除 Patchouli 依赖。
   - `build.gradle` 删除 `implementation files('libs/Patchouli-...jar')`。
   - `neoforge.mods.toml` 删除 `patchouli` 依赖声明块（该块曾因版本区间
     `[1.21.1-93-NEOFORGE,)` 被 Maven 版本比较判为不满足，导致 `run/crash-reports/`
@@ -19,3 +19,5 @@
 
 - 文档/引导方案待定。手册能力已随 Patchouli 移除，后续如需游戏内引导，
   候选方案见 `docs/idea.md`。
+
+- 移除 Curios API 依赖。项目现在**没有任何外部模组依赖**。

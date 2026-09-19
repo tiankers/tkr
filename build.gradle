@@ -52,6 +52,6 @@ tasks.configureEach {
 }
 
 dependencies {
-
-    implementation files('libs/curios-neoforge-9.5.1+1.21.1.jar')
+    // 目前没有外部依赖。需要引入本地 jar 时，把 jar 放进 libs/ 并在此声明，例如：
+    //     implementation files('libs/<name>.jar')
 }

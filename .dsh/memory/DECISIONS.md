@@ -13,7 +13,9 @@
   1. 用户从三个方案中明确选择了 C。
   2. 项目强制依赖 Curios，而 Curios 集成横跨「注册、逻辑、客户端渲染」三处，需要结构性隔离，而非靠自觉。
   3. MC 模组最常见的生产事故是「逻辑层引用客户端类 → 服务端专用环境启动崩溃」。四层结构把这个错误从联机测试才能发现提前到**编译期**。
-  4. 协议为 LGPL-2.1-only，`api/` 作为对外兼容性承诺有实际意义（他人可依赖、不可改）。
+  4. 协议为 **LGPL-3.0-only**（**注**：D-001 立论时为 LGPL-2.1-only，经 D-016 短暂改为
+     CC BY-NC-ND，再由 D-017 改为 LGPL-3.0-only；详见 D-017 的来回记录），
+     `api/` 作为对外兼容性承诺有实际意义。
 - **被否决的替代项**：
   - **方案 A（按技术角色扁平分层）**：上手最快、最贴近 NeoForge 教程，但每个新系统要同时改 6 个包，删功能要跨包删，系统一多 `content/` 会变成垃圾堆。
   - **方案 B（按功能纵切 + core）**：隔离性同样优秀且增量开发最友好，是当时的推荐项；用户未选。
@@ -114,6 +116,9 @@
 
 ## D-012 组件提示由组件自身实现（`TooltipProvider`），不写客户端代码
 
+> **⚠️ 本条已被 D-015 推翻。** 实测证明 `TooltipProvider` 对**自定义组件无效**。
+> 保留此条是为了记录「曾这样决定、以及为什么它不成立」，避免后来者重复尝试。
+
 - **日期**：2026-09-19
 - **结论**：`StrengthDamage implements TooltipProvider`，在 `addToTooltip` 中输出
   「伤害系数」「伤害额值」与派生信息；不新建客户端提示类。
@@ -123,6 +128,10 @@
   3. `logic` 层因此完全不必关心「怎么显示」，只消费组件的数值。
 - **被否决的替代项**：在 `client/tooltip` 里写一个组件提示处理器 —— 会把某个组件的显示知识
   放到另一层，形成不必要的耦合；且需要额外的注册与 Dist 处理。
+- **❌ 为什么失败**：原版 `ItemStack.getTooltipLines()` **不遍历所有组件**，
+  而是硬编码调用 8 个固定组件（JUKEBOX_PLAYABLE / TRIM / STORED_ENCHANTMENTS /
+  ENCHANTMENTS / DYED_COLOR / LORE / UNBREAKABLE），自定义组件的
+  `addToTooltip` **永不触发**，且没有任何报错。详见 `PITFALLS.md` P-023。
 
 ## D-013 属性翻译键采用原版惯例 `attribute.name.<namespace>.<path>`
 
@@ -164,3 +173,104 @@
   可用 `StrengthConfig.EXPAND_VANILLA_ATTRIBUTE_RANGES = false` 关闭
   （只保留 TKR 自己属性的放宽）。
 
+
+## D-015 自定义组件提示改用表现层 `ItemTooltipEvent`（推翻 D-012）
+
+- **日期**：2026-09-19
+- **结论**：组件提示**不能**靠实现 `TooltipProvider` 自动生效。
+  改由 `client/tooltip/StrengthTooltip` 订阅 `ItemTooltipEvent`，
+  主动读取组件并追加提示行；`StrengthDamage` 回归**纯数据**（不再实现该接口）。
+- **理由**：原版 `ItemStack.getTooltipLines()` 只对**硬编码的 8 个组件**调用
+  `addToTooltip`，自定义组件不在其中，其实现**永远不会被调用**且**不报错**。
+  NeoForge 21.1.232 也没有提供注册自定义组件提示的钩子（已核验全 jar）。
+- **被否决的替代项**：
+  - 保留 `TooltipProvider` 实现「以防万一」 —— 它永远不会被调用，留着会误导后来的会话
+    以为提示已经由组件负责，反而增加排查成本。**故明确移除并写下原因。**
+  - 用 mixin 往 `getTooltipLines` 里插逻辑 —— 本项目无 mixin 基础设施，且风险远高于收益。
+- **附带收益**：反而更符合四层结构 —— `data` 层只提供数据，显示归 `client` 层。
+- **验证**：用户实测提示已正常显示（`伤害系数：700%` / `伤害额值：9` /
+  `力量达到 1.29 时取得完整线性加成`），并有一次性诊断日志佐证。
+- **教训**：这条错误**编译期、启动期都发现不了**，只有真正悬停物品才会暴露。
+## D-016 许可证由 LGPL-2.1-only 改为 CC BY-NC-ND 4.0
+
+- **日期**：2026-09-19
+- **结论**：项目协议改为 **CC BY-NC-ND 4.0**。同步修改的文件：
+  `gradle.properties: mod_license`、`META-INF/neoforge.mods.toml: license`、
+  `README.md`、`LICENSE`、`api/package-info.java` 的协议说明。
+- **理由**：用户明确要求改为「可依赖、不允许修改、不允许商用」。
+  CC BY-NC-ND 的 NoDerivatives + NonCommercial 正好对应这两个诉求。
+- **为什么改协议前要先纠正一处错误说法**：原 `README.md` 写「LGPL-2.1-only（可依赖，
+  **不允许修改代码**）」——**这句话与 LGPL 的实际条款不符**。LGPL 明确允许他人修改并重新分发
+  （只要求同样开源）。也就是说项目原先的**意图**与所选**许可证**不一致；改到 CC BY-NC-ND 后
+  意图与条款才真正对齐。
+- **⚠️ 已知代价（用户已知悉）**：
+  1. **CC 官方不建议把 CC 许可用于软件** —— CC 自己的 FAQ 指出 CC 许可不含专利授权，
+     且不适合软件；软件应优先用软件专用许可证。
+  2. **可能失去 CurseForge 收益计划资格** —— CurseForge 的 Reward Program 属于
+     商业化使用，与 NonCommercial 条款冲突。
+  3. **NoDerivatives 与模组生态摩擦** —— 整合包作者无法制作修改版或移植版；
+     只能原样分发（已在 LICENSE 里显式写明整合包分发是允许的）。
+  4. **SPDX 标识符**：`CC-BY-NC-ND-4.0`。CurseForge 许可证下拉里若不直接提供，
+     需选择 Custom 并粘贴 `LICENSE` 内容。
+- **被否决的替代项**：若用户想要的是「可依赖、不可修改、但允许商用」，CC BY-ND 4.0
+  更合适（去掉 NC）；若想要「软件专用 + 禁止闭源再分发」，PolyForm 系列更贴切。
+  这两项已在回复中提示，用户未采纳。
+## D-017 许可证最终定为 LGPL-3.0-only（取代 D-016）
+
+- **日期**：2026-09-19
+- **结论**：协议定为 **LGPL-3.0-only**（SPDX: `LGPL-3.0-only`），取代 D-016 的
+  CC BY-NC-ND 4.0。同步修改 `gradle.properties`、`neoforge.mods.toml`、`README.md`、
+  `LICENSE`、`api/package-info.java`。
+- **理由**：用户放弃 CC BY-NC-ND 方案，直接指定 LGPL-3.0。
+- **许可证变更史（重要，勿再混淆）**：
+  | 顺序 | 协议 | 决策 |
+  |---|---|---|
+  | 1 | LGPL-2.1-only | 项目初始（D-001 立论时的状态） |
+  | 2 | CC BY-NC-ND 4.0 | D-016（用户要求「不许改、不许商用」） |
+  | 3 | **LGPL-3.0-only** | **D-017（当前）** |
+- **订正一处长期存在的错误说法**：变更前的 `README.md` 写「LGPL-2.1-only（可依赖，
+  **不允许修改代码**）」——**在 LGPL 下这不成立**（LGPL 明确允许修改后以 LGPL/GPL 重新分发）。
+  当前 README 已改为「可依赖、含闭源项目；修改后重新分发须同样开源」，与实际条款一致。
+- **LGPL-3.0 的一个结构要点**：它**不是独立文档**，前言写明
+  *"incorporates the terms and conditions of version 3 of the GNU General Public License,
+  supplemented by the additional permissions listed below"* —— 必须与 **GPL-3.0** 一起构成完整条款。
+  因此 `LICENSE` 里：
+  1. 完整收录可获取的 LGPL-3.0 文本（来自 `https://www.gnu.org/licenses/lgpl-3.0.txt`）；
+  2. 对 GPL-3.0 **采用引用方式**（给出 `https://www.gnu.org/licenses/gpl-3.0.txt` 链接），
+     以免在仓库里存放一份会过期的第三方文档副本。这一处理与 D-016 的引用式做法一致。
+- **为什么这个选择比 CC BY-NC-ND 更契合软件**：LGPL 是软件专用协议，含专利条款，
+  且「可作为库被闭源项目依赖」这一模式正是为模组 API 场景设计的。
+  CC 官方本身也不建议把 CC 许可用于软件（见 D-016 的记录）。
+- **用户已知悉的差异**：LGPL **允许**他人修改后开源再分发，也**允许**商用
+  （与 CC BY-NC-ND 的 ND + NC 相反）。若日后仍要禁止修改/商用，需回到 D-016 的方案
+  或改用自定义协议。
+## D-018 移除 Curios API 依赖，项目成为零外部依赖
+
+- **日期**：2026-09-19
+- **结论**：Curios 从 `build.gradle`、`neoforge.mods.toml`、`libs/` 与文档中移除。
+  项目现在**只需 Minecraft 1.21.1 + NeoForge**。
+- **理由**：用户明确要求去除。同时这也消除了唯一的编译期外部依赖 ——
+  之前 `libs/curios-neoforge-9.5.1+1.21.1.jar` 是**唯一**的外部 jar。
+- **改动清单**：
+  | 文件 | 改动 |
+  |---|---|
+  | `build.gradle` | 删除 `implementation files('libs/curios-...jar')`，`dependencies` 留空并加注释 |
+  | `neoforge.mods.toml` | 删除 `[[dependencies.tkr]] modId="curios"` 块；description 改为 "Requires no other mods." |
+  | `libs/` | 删除 Curios jar（目录现为空） |
+  | `README.md` | 依赖表 → 「无外部模组依赖」 |
+  | `CHANGELOG.md` | 记录本次移除 |
+  | `api/package-info.java`、`logic/package-info.java`、`MinStrengthGate.java` | 去掉 Curios 相关表述 |
+  | `docs/curseforge-description.md` | Requirements 去掉 Curios；Related Projects 说明无需填写 |
+  | `SKILL.md` | 依赖表、架构表、陷阱清单、参考表同步 |
+  | `references/curios-9.5.1-api.md` | **保留但标记为历史资料**（依赖已移除，jar 已删） |
+- **实跑验证**：`runClient` 正常启动，Mod List 只剩 `damage_number` / `minecraft` / `neoforge` / `tkr`，
+  资源包列表无 `mod/curios`，无 `Mod tkr requires curios` 报错，属性自检与上限放宽均正常。
+- **副作用（须知）**：
+  1. **护具穿戴门槛**彻底没有实现路径了 —— 原先设想的 `CurioCanEquipEvent` 随依赖移除而不可用。
+     原版装备事件又不可取消。若日后要做该门槛，需要另找可拦截的挂载点。
+  2. `logic/curios/` 空包目录已不再是规划中的模块（`logic/package-info.java` 的职责列表已改为
+     `strength`）。
+  3. `run/config/` 下仍有 Curios 生成的配置文件残留（`curios-client.toml` 等），
+     它们不再被任何模组读取，可安全删除。
+- **教训（复用 P-001 的纪律）**：**依赖变更必须实跑验证**。P-001 正是「区间写错导致加载失败」
+  的先例，因此本次移除后仍然启动了一次客户端确认，而不是只看 `build` 成功。

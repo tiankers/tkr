@@ -31,6 +31,15 @@
 | 2026-09-19 | **放宽属性上限（已实跑验证）** | 反射改写 `RangedAttribute.maxValue` 至 `1e20`；**34 个属性全成功、0 失败**，钳制测试通过；只改上限不改下限（参照 AttributeFix）；见 D-014、P-021、P-022 |
 | 2026-09-19 | **新增 `/tkr` 指令给手上物品赋组件** | `/tkr strength_damage <p> [T]` 与 `/tkr min_strength <value>`，各带 `remove`；含容器同步与中英反馈；编译通过、实跑无异常 |
 | 2026-09-19 | **安装开发期伤害数字模组（非依赖）** | `run/mods/1.21-damage_number-2.0.3.jar`；FML 自动扫描加载（Mod List 已确认），**未改动 build.gradle**；见 SKILL.md §5b |
+| 2026-09-19 | **修正物品提示不显示（P-023）** | 根因：原版只对**硬编码的 8 个组件**调用 `TooltipProvider`，自定义组件永不生效且静默。改用表现层 `ItemTooltipEvent`；用户实测已显示「伤害系数/伤害额值/弯折点」 |
+| 2026-09-19 | **新增 `/tkrattribute` 与 `/tkrlist`** | 合并进 `TkrCommands.java`；`/tkrlist` 从指令树动态生成；启动自检确认三条指令全部注册；修复 `getSmartUsage` 两个坑（P-024，用离线 Brigadier 验证） |
+| 2026-09-19 | **修复 `/tkrattribute` 属性名无 Tab 补全（P-025）** | 根因：`ResourceLocationArgument.id()` 补全不限定注册表。显式挂 `SharedSuggestionProvider.suggestResource(TkrAttributes.tkrAttributeIds(), builder)`；候选从注册表动态取 |
+| 2026-09-19 | **项目定名 TKR Lib + 生成 CurseForge 描述** | 显示名改为 `TKR Lib`（modId 保持 `tkr` 不变）；`docs/curseforge-description.md`（英文描述 + Summary + 命名说明 + 上传清单）；`mods.toml` 补上 `description`；许可证 LGPL-3.0-only |
+| 2026-09-19 | **支持远程伤害** | `resolveWeapon` 区分近战/投射物：投射物优先取 `directEntity.getWeaponItem()`（箭矢记录弓弩），为空则回退攻击者主手（投掷类）；删除死配置 `MELEE_ONLY` |
+| 2026-09-19 | **移除 Curios 依赖，成为零外部依赖** | `build.gradle`/`mods.toml`/`libs/`/文档全部清理；实跑确认 Mod List 无 curios、无 requires 报错；Curios 参考文件标记为历史资料 |
+| 2026-09-19 | **确认双端可用（客户端 + 专用服务端均实跑）** | `runServer` 正常启动、Mod List 正确、无客户端类加载错误；确认模组需**双端安装**（服务端权威结算 + 客户端提示） |
+| 2026-09-20 | **修复崩溃：指令参数缺上界导致非法值写进物品（P-026）** | `/tkr` 数值参数改用 `doubleArg(min, max)`，上界与组件 codec 同源（`attributeMax()`）；伤害结算加 Infinity 夹断；新增 `.dsh/tools/nbt_component_tool.py` 排查存档 |
+| 2026-09-20 | **确认崩溃后存档未被污染** | 实读 `playerdata` NBT：磁盘上只有合法值（失败发生在**保存阶段**，非法值从未写盘）；重新进游戏正常读档、玩家成功登录 |
 | 2026-09-19 | **推翻并更正自己的两处错误结论** | ① 属性 id 前缀（D-006）；② P-001 的「纯数字下界」建议经 Maven 实测为错，见 `PITFALLS.md` P-001 修正记录与 D-009 |
 
 ## 待办（按依赖顺序）

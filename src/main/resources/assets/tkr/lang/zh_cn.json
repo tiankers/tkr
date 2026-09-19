@@ -1,0 +1,22 @@
+{
+  "attribute.name.tkr.strength": "力量",
+  "item.tkr.strength_blade": "力量之刃",
+  "item.tkr.tooltip.damage_ratio": "伤害系数：%s%%",
+  "item.tkr.tooltip.damage_threshold": "伤害额值：%s",
+  "item.tkr.tooltip.damage_bend": "力量达到 %s 时取得完整线性加成",
+  "item.tkr.tooltip.requires_strength": "需要力量：%s",
+  "item.tkr.tooltip.strength_short": "需要力量：%s（当前 %s）",
+  "item.tkr.tooltip.strength_ok": "力量要求已满足：%s",
+  "commands.tkr.strength_damage.success": "已为 %s 赋予力量伤害：系数 %s，额值 %s",
+  "commands.tkr.min_strength.success": "已为 %s 设置力量下限：%s",
+  "commands.tkr.remove.success": "已从 %s 移除 %s 组件",
+  "commands.tkr.remove.absent": "%s 上没有 %s 组件",
+  "commands.tkr.not_player": "该指令只能由玩家执行",
+  "commands.tkr.empty_hand": "主手必须持有物品",
+  "commands.tkrattribute.success": "已将 %s 设为 %s，影响 %s 个目标",
+  "commands.tkrattribute.wrong_namespace": "%s 不属于 tkr 命名空间；此处只能设置 TKR 自己的属性（原版属性请用 /attribute）",
+  "commands.tkrattribute.unknown": "未知的 TKR 属性：%s",
+  "commands.tkrattribute.no_target": "没有匹配的目标：%s 个目标缺少该属性或不是生物",
+  "commands.tkrlist.header": "TKR 指令（共 %s 条）：",
+  "commands.tkrlist.line": "  %s"
+}

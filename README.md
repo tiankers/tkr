@@ -2,7 +2,7 @@
 
 - **作者**：tiankers
 - **适用版本**：Minecraft 1.21.1 / NeoForge
-- **开源协议**：LGPL-2.1-only（可依赖，不允许修改代码）
+- **开源协议**：LGPL-3.0-only（可依赖、含闭源项目；修改后重新分发须同样开源）
 
 ## 构建 / 运行
 
@@ -14,12 +14,10 @@
 
 ## 依赖
 
-| 依赖 | 版本 | 类型 |
-|---|---|---|
-| Curios API | 9.5.1+1.21.1 | **必须** |
+**无外部模组依赖**，只需 Minecraft 1.21.1 + NeoForge（版本见 `gradle.properties` 的 `neo_version`）。
 
-jar 在 `libs/`，由 `build.gradle` 的 `files(...)` 引入。
-依赖声明在 `src/main/resources/META-INF/neoforge.mods.toml`。
+需要引入本地 jar 时，把 jar 放进 `libs/` 并在 `build.gradle` 的 `dependencies` 中声明；
+运行期依赖需同时写入 `src/main/resources/META-INF/neoforge.mods.toml`。
 
 ## 目录
 

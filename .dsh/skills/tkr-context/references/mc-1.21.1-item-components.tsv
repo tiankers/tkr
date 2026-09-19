@@ -1,0 +1,58 @@
+id	en_name	zh_name	java类型	是否落盘	是否同步	简介	来源
+custom_data	Custom Data	自定义数据	DataComponentType<CustomData>	是	否	唯一允许存放任意 CompoundTag 的组件，是官方留的逃生舱。优先用专用组件；只有自有的纯内部状态且无对应组件时才用它。注册时未显式声明 networkSynchronized，build() 会回退到 ByteBufCodecs.fromCodecWithRegistries(codec) 的通用流编解码器，同步仍可行但编码效率不如手写 codec。	jar 提取；名称与简介为手工撰写
+max_stack_size	Max Stack Size	最大堆叠数量	DataComponentType<Integer>	是	是	控制单组最大堆叠数。落盘用 ExtraCodecs.intRange(1,99)，超出范围直接编解码失败。Item.getMaxStackSize() 的兜底是 1 而不是 64，默认 64 只来自 COMMON_ITEM_COMPONENTS——自行构造组件表时漏设它会让物品莫名不可堆叠。	jar 提取；名称与简介为手工撰写
+max_damage	Max Damage	最大耐久	DataComponentType<Integer>	是	是	耐久上限，落盘用 ExtraCodecs.POSITIVE_INT，必须为正整数。它与 damage 一起构成「有耐久」的物品。	jar 提取；名称与简介为手工撰写
+damage	Damage	已消耗耐久	DataComponentType<Integer>	是	是	当前已消耗的耐久，落盘用 ExtraCodecs.NON_NEGATIVE_INT。陷阱：只要此组件存在且 max_stack_size > 1，注册期就抛 IllegalStateException("Item cannot have both durability and be stackable")。	jar 提取；名称与简介为手工撰写
+unbreakable	Unbreakable	无法破坏	DataComponentType<Unbreakable>	是	是	使物品不消耗耐久。值是 record Unbreakable(boolean showInTooltip)，该布尔只控制是否显示「无法破坏」提示行，不影响是否真的不可破坏。	jar 提取；名称与简介为手工撰写
+custom_name	Custom Name	自定义名称	DataComponentType<Component>	是	是	铁砧改名写在这里，是玩家实际看到的物品名；LockCode.unlocksWith 也正是拿它与锁字符串比较。	jar 提取；名称与简介为手工撰写
+item_name	Item Name	物品名称	DataComponentType<Component>	是	是	覆盖物品的基础名（常用于覆盖语言文件里的名称）。它不是「自定义名称」：custom_name 优先级更高，两者混用会得到意外的显示名。	jar 提取；名称与简介为手工撰写
+lore	Lore	描述文本	DataComponentType<ItemLore>	是	是	tooltip 中附加的说明文本行，原版由 SetLoreFunction 写入。	jar 提取；名称与简介为手工撰写
+rarity	Rarity	稀有度	DataComponentType<Rarity>	是	是	决定物品名的颜色与稀有度分级；COMMON_ITEM_COMPONENTS 默认给 Rarity.COMMON。	jar 提取；名称与简介为手工撰写
+enchantments	Enchantments	附魔	DataComponentType<ItemEnchantments>	是	是	物品自身携带的附魔。1.21 起附魔不再是 NBT 列表，读写必须走组件（EnchantmentHelper 已按其实现）。	jar 提取；名称与简介为手工撰写
+can_place_on	Can Place On	可放置于	DataComponentType<AdventureModePredicate>	是	是	冒险模式下允许放置的方块白名单。谓词内的方块 id 必须能在当前注册表中解析。	jar 提取；名称与简介为手工撰写
+can_break	Can Break	可破坏	DataComponentType<AdventureModePredicate>	是	是	冒险模式下允许破坏的方块白名单，与 can_place_on 同为 AdventureModePredicate 谓词结构。	jar 提取；名称与简介为手工撰写
+attribute_modifiers	Attribute Modifiers	属性修饰符	DataComponentType<ItemAttributeModifiers>	是	是	手持/穿戴该物品时生效的属性修饰符。陷阱：内部属性 id 必须带前缀（generic.max_health、player.block_break_speed 等），写成裸名会解析失败。	jar 提取；名称与简介为手工撰写
+custom_model_data	Custom Model Data	自定义模型数据	DataComponentType<CustomModelData>	是	是	资源包据此切换模型。1.21.1 的值只是 record CustomModelData(int value)，尚未扩展为多值结构。	jar 提取；名称与简介为手工撰写
+hide_additional_tooltip	Hide Extra Tooltip	隐藏附加提示	DataComponentType<Unit>	是	是	隐藏附魔、属性修饰符等附加提示行，但保留物品名与 lore。	jar 提取；名称与简介为手工撰写
+hide_tooltip	Hide Tooltip	隐藏全部提示	DataComponentType<Unit>	是	是	完全隐藏 tooltip，除 F3+H 外看不到任何提示行。	jar 提取；名称与简介为手工撰写
+repair_cost	Repair Cost	修理惩罚	DataComponentType<Integer>	是	是	铁砧的修理惩罚等级，落盘用 ExtraCodecs.NON_NEGATIVE_INT；等级越高在铁砧上操作越贵。	jar 提取；名称与简介为手工撰写
+creative_slot_lock	Creative Slot Lock	创造槽位锁定	DataComponentType<Unit>	否	是	锁定创造模式物品栏中的槽位（原版用于生存下不可用的物品，由 CreativeModeInventoryScreen 读取）。没有 persistent codec，codec()==null 即 transient：DataComponentPatch.CODEC 编码时会跳过 transient 组件，PERSISTENT_CODEC 也会直接报错，因此不会写入存档；但 build() 仍提供了 stream codec，可随网络包同步。	jar 提取；名称与简介为手工撰写
+enchantment_glint_override	Glint Override	附魔光效覆盖	DataComponentType<Boolean>	是	是	强制打开或关闭附魔光效，与物品是否真的有附魔无关。	jar 提取；名称与简介为手工撰写
+intangible_projectile	Intangible Proj	无形投掷物	DataComponentType<Unit>	是	否	使投射物不与其他实体碰撞（原版用于光灵箭一类）。未显式声明 networkSynchronized，构建时回退到 ByteBufCodecs.fromCodecWithRegistries(codec) 的通用流编解码器。	jar 提取；名称与简介为手工撰写
+food	Food	食物	DataComponentType<FoodProperties>	是	是	食物属性：营养值、饱和度与食用效果/耗时。1.21 起食物不再是 Item 子类的字段，而是这个组件。	jar 提取；名称与简介为手工撰写
+fire_resistant	Fire Resistant	抗火	DataComponentType<Unit>	是	是	物品实体不会被火烧毁（原版下界合金系列）。	jar 提取；名称与简介为手工撰写
+tool	Tool	工具规则	DataComponentType<Tool>	是	是	挖掘速度与「哪些方块掉落」的规则表。1.21 起取代了旧的 Tier/挖掘等级体系。	jar 提取；名称与简介为手工撰写
+stored_enchantments	Stored Enchantments	存储的附魔	DataComponentType<ItemEnchantments>	是	是	附魔书记录的附魔，不作用于持有者，只在铁砧/砂轮转移时生效——必须与 enchantments 分清。	jar 提取；名称与简介为手工撰写
+dyed_color	Dyed Color	染色颜色	DataComponentType<DyedItemColor>	是	是	皮革类可染色物品的颜色，原版通过炼药锅交互写入。	jar 提取；名称与简介为手工撰写
+map_color	Map Color	地图颜色	DataComponentType<MapItemColor>	是	是	地图的底色/基色，用于地图渲染着色。	jar 提取；名称与简介为手工撰写
+map_id	Map Id	地图编号	DataComponentType<MapId>	是	是	指向存档中具体地图数据的编号；改它等于换一张地图。	jar 提取；名称与简介为手工撰写
+map_decorations	Map Decorations	地图标记	DataComponentType<MapDecorations>	是	否	地图上的图标标记（旗帜、林地府邸等）及其坐标与旋转。未显式声明 networkSynchronized，构建时回退到 ByteBufCodecs.fromCodecWithRegistries(codec) 的通用流编解码器。	jar 提取；名称与简介为手工撰写
+map_post_processing	Map Post Processing	地图后处理	DataComponentType<MapPostProcessing>	否	是	地图的缩放/锁定后处理标记，值是枚举 LOCK / SCALE。没有 persistent codec，属 transient：DataComponentPatch.CODEC 会跳过它，不会写入存档。	jar 提取；名称与简介为手工撰写
+charged_projectiles	Charged Projectiles	已装填投掷物	DataComponentType<ChargedProjectiles>	是	是	弩已装填的投射物列表，原版弩的全部装填逻辑都围绕它。	jar 提取；名称与简介为手工撰写
+bundle_contents	Bundle Contents	收纳袋内容	DataComponentType<BundleContents>	是	是	收纳袋内装的物品与权重计算。1.21 收纳袋不再用 NBT 存内容。	jar 提取；名称与简介为手工撰写
+potion_contents	Potion Contents	药水内容	DataComponentType<PotionContents>	是	是	药水/药箭/滞留药水的效果列表与自定义颜色。1.21 起药水数据不再是 Potion NBT。	jar 提取；名称与简介为手工撰写
+suspicious_stew_effects	Suspicious Stew	迷之炖菜效果	DataComponentType<SuspiciousStewEffects>	是	是	迷之炖菜食用后给出的效果列表，决定它可以带哪种效果。	jar 提取；名称与简介为手工撰写
+writable_book_content	Writable Book	书与笔内容	DataComponentType<WritableBookContent>	是	是	书与笔的页面文本；写入需在服务端校验（原版由 ServerGamePacketListenerImpl 处理）。	jar 提取；名称与简介为手工撰写
+written_book_content	Written Book Content	成书内容	DataComponentType<WrittenBookContent>	是	是	成书的标题、作者、世代与页面；复制与展示都读它。	jar 提取；名称与简介为手工撰写
+trim	Trim	盔甲纹饰	DataComponentType<ArmorTrim>	是	是	盔甲纹饰的材质与图案，原版由锻造台写入。	jar 提取；名称与简介为手工撰写
+debug_stick_state	Debug Stick State	调试棒状态	DataComponentType<DebugStickState>	是	否	调试棒记住的「方块 → 当前编辑的属性」映射。未显式声明 networkSynchronized，构建时回退到 ByteBufCodecs.fromCodecWithRegistries(codec) 的通用流编解码器。	jar 提取；名称与简介为手工撰写
+entity_data	Entity Data	实体数据	DataComponentType<CustomData>	是	是	刷怪蛋/悬挂实体物品携带的实体 CompoundTag，落盘用 CustomData.CODEC_WITH_ID（会带 id 字段）。	jar 提取；名称与简介为手工撰写
+bucket_entity_data	Bucket Entity Data	桶装实体数据	DataComponentType<CustomData>	是	是	桶装生物（鱼、美西螈、蝌蚪等）的实体数据；用 CustomData.CODEC，不带 id。	jar 提取；名称与简介为手工撰写
+block_entity_data	Block Entity Data	方块实体数据	DataComponentType<CustomData>	是	是	方块物品放置时写入方块实体的 NBT，落盘用 CustomData.CODEC_WITH_ID；内容仍由原版校验。	jar 提取；名称与简介为手工撰写
+instrument	Instrument	乐器	DataComponentType<Holder<Instrument>>	是	是	山羊角对应的乐器注册表引用（Holder<Instrument>，不是内联数据），注册表解析失败会直接报错。	jar 提取；名称与简介为手工撰写
+ominous_bottle_amplifier	Ominous Bottle Level	不详之瓶等级	DataComponentType<Integer>	是	是	不详之瓶给予的不祥之兆等级，落盘用 ExtraCodecs.intRange(0, 4)。	jar 提取；名称与简介为手工撰写
+jukebox_playable	Jukebox Playable	可播放唱片	DataComponentType<JukeboxPlayable>	是	是	可放入唱机播放的曲目引用（EitherHolder<JukeboxSong>）及是否显示提示行。	jar 提取；名称与简介为手工撰写
+recipes	Recipes	配方	DataComponentType<List<ResourceLocation>>	是	否	知识之书使用后解锁的配方 id 列表。未显式声明 networkSynchronized，构建时回退到 ByteBufCodecs.fromCodecWithRegistries(codec) 的通用流编解码器。	jar 提取；名称与简介为手工撰写
+lodestone_tracker	Lodestone Tracker	磁石追踪	DataComponentType<LodestoneTracker>	是	是	指南针绑定的磁石位置与是否已追踪成功；原版 CompassItem 全依赖它。	jar 提取；名称与简介为手工撰写
+firework_explosion	Firework Explosion	烟花爆炸	DataComponentType<FireworkExplosion>	是	是	单次爆炸的形状、颜色、淡出与拖尾，是烟花之星的核心数据。	jar 提取；名称与简介为手工撰写
+fireworks	Fireworks	烟花	DataComponentType<Fireworks>	是	是	烟花火箭的飞行时长与爆炸列表。	jar 提取；名称与简介为手工撰写
+profile	Profile	玩家档案	DataComponentType<ResolvableProfile>	是	是	玩家头颅绑定的皮肤档案（名称/UUID/属性），可由服务器解析。	jar 提取；名称与简介为手工撰写
+note_block_sound	Note Block Sound	音符盒音色	DataComponentType<ResourceLocation>	是	是	头颅放在音符盒上时使用的音色 id。	jar 提取；名称与简介为手工撰写
+banner_patterns	Banner Patterns	旗帜图案	DataComponentType<BannerPatternLayers>	是	是	旗帜上的图案层列表，列表顺序即渲染顺序。	jar 提取；名称与简介为手工撰写
+base_color	Base Color	基础颜色	DataComponentType<DyeColor>	是	是	物品的基础颜色，原版用于盾牌的底色调。	jar 提取；名称与简介为手工撰写
+pot_decorations	Pot Decorations	陶罐纹样	DataComponentType<PotDecorations>	是	是	饰纹陶罐四个面各自的陶片图案。	jar 提取；名称与简介为手工撰写
+container	Container	容器内容	DataComponentType<ItemContainerContents>	是	是	潜影盒等方块物品的容器内容。1.21 起方块物品内容走此组件，而不是 BlockEntityTag。	jar 提取；名称与简介为手工撰写
+block_state	Block State	方块状态	DataComponentType<BlockItemStateProperties>	是	是	方块物品被放置时要应用的方块状态属性（原版用于光源方块、蜂箱等）。	jar 提取；名称与简介为手工撰写
+bees	Bees	蜜蜂	DataComponentType<List<BeehiveBlockEntity.Occupant>>	是	是	蜂巢/蜂箱内蜜蜂的列表，含每只蜜蜂的实体数据与存活时间。	jar 提取；名称与简介为手工撰写
+lock	Lock	锁	DataComponentType<LockCode>	是	否	容器的锁定字符串（record LockCode(String key)）；开锁时拿它与手持物品的 custom_name 比较。有持久化 codec 但未显式声明 networkSynchronized，构建时回退到通用流编解码器。	jar 提取；名称与简介为手工撰写
+container_loot	Container Loot	容器战利品表	DataComponentType<SeededContainerLoot>	是	否	容器首次打开时生成战利品所用的战利品表与随机种子。未显式声明 networkSynchronized，构建时回退到 ByteBufCodecs.fromCodecWithRegistries(codec) 的通用流编解码器。	jar 提取；名称与简介为手工撰写

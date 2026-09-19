@@ -1,0 +1,22 @@
+{
+  "attribute.name.tkr.strength": "Strength",
+  "item.tkr.strength_blade": "Blade of Strength",
+  "item.tkr.tooltip.damage_ratio": "Damage Coefficient: %s%%",
+  "item.tkr.tooltip.damage_threshold": "Damage Threshold: %s",
+  "item.tkr.tooltip.damage_bend": "Full linear bonus at Strength %s",
+  "item.tkr.tooltip.requires_strength": "Requires Strength: %s",
+  "item.tkr.tooltip.strength_short": "Requires Strength: %s (you have %s)",
+  "item.tkr.tooltip.strength_ok": "Strength requirement met: %s",
+  "commands.tkr.strength_damage.success": "Applied strength damage to %s: coefficient %s, threshold %s",
+  "commands.tkr.min_strength.success": "Applied strength requirement to %s: %s",
+  "commands.tkr.remove.success": "Removed %s component from %s",
+  "commands.tkr.remove.absent": "%s has no %s component",
+  "commands.tkr.not_player": "This command must be run by a player",
+  "commands.tkr.empty_hand": "You must hold an item in your main hand",
+  "commands.tkrattribute.success": "Set %s to %s for %s target(s)",
+  "commands.tkrattribute.wrong_namespace": "%s is not in the tkr namespace; only TKR attributes are allowed here (use /attribute for vanilla attributes)",
+  "commands.tkrattribute.unknown": "Unknown TKR attribute: %s",
+  "commands.tkrattribute.no_target": "No matching target: %s target(s) lack this attribute or are not living entities",
+  "commands.tkrlist.header": "TKR commands (%s):",
+  "commands.tkrlist.line": "  %s"
+}

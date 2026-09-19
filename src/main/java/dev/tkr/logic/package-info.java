@@ -3,7 +3,7 @@
  *
  * <h2>职责</h2>
  * <ul>
- *   <li>{@code curios} —— Curios 集成：槽位注册、饰品行为实现、槽位变更处理。</li>
+ *   <li>{@code strength} —— 力量机制：属性注入、伤害结算、使用门槛、指令。</li>
  *   <li>{@code effect} —— 状态效果、能力加成、数值结算。</li>
  *   <li>{@code machine} —— 方块实体、容器、Tick 逻辑等持续运转的系统。</li>
  *   <li>{@code event} —— 游戏总线事件订阅（各系统的接线点）。</li>

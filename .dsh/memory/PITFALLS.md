@@ -190,6 +190,125 @@
   ```
 - **教训**：跨语言写数学代码时，标准库函数集合会变。**依赖编译器把关，不要凭"别的语言有"就写**。
 
+## P-023 自定义组件实现 `TooltipProvider` **无效**（原版只调用硬编码列表）
+
+- **现象**（本项目真实发生）：给自定义组件 `tkr:strength_damage` 实现了
+  `TooltipProvider.addToTooltip`，**编译通过、启动无错、物品提示里却什么都不显示**，
+  完全静默。用户反馈「没在物品信息栏看到 p 和 T」。
+- **根因**：原版 `ItemStack.getTooltipLines()` **不是遍历所有组件**，而是<b>硬编码固定列表</b>：
+  ```java
+  this.addToTooltip(DataComponents.JUKEBOX_PLAYABLE, ...);
+  this.addToTooltip(DataComponents.TRIM, ...);
+  this.addToTooltip(DataComponents.STORED_ENCHANTMENTS, ...);
+  this.addToTooltip(DataComponents.ENCHANTMENTS, ...);
+  this.addToTooltip(DataComponents.DYED_COLOR, ...);
+  this.addToTooltip(DataComponents.LORE, ...);
+  this.addToTooltip(DataComponents.UNBREAKABLE, ...);
+  ```
+  **只有这 8 个**。自定义组件不在其中，其 `addToTooltip` **永远不会被调用**。
+  NeoForge 21.1.232 **也没有**注册自定义组件提示的钩子（全 jar 只有
+  `IDataComponentHolderExtension` 两个辅助方法，仍需手动调用）。
+- **正确做法**：用**表现层**的 `ItemTooltipEvent` 主动读取组件并追加提示行：
+  ```java
+  @EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT, bus = Bus.GAME)
+  public final class XxxTooltip {
+      @SubscribeEvent
+      public static void onItemTooltip(ItemTooltipEvent event) {
+          var data = event.getItemStack().get(MY_COMPONENT);
+          if (data != null) event.getToolTip().add(Component.literal(...));
+      }
+  }
+  ```
+  这样也更符合分层：`data` 层只提供数据，`client` 层负责显示。
+- **教训**：这类错误**编译期、启动期都发现不了**，只有真正悬停物品才会暴露。
+  排查「组件明明设了却不显示」时，第一嫌疑就是它。
+
+## P-024 `CommandDispatcher.getSmartUsage` 的两个坑
+
+- **现象**（本项目真实发生，`/tkrlist` 输出错误）：
+  1. 打印成 `/strength_damage (<p>|remove)` —— **丢了 `tkr` 前缀**，照抄无法执行。
+  2. `/tkrlist` 这条指令**完全没有出现在列表里**。
+- **根因**：
+  1. `getSmartUsage(node, source)` 返回的是**相对用法**，不含根指令名。
+  2. 它**只对子节点生成用法**。没有子节点、但自身可执行的指令（如 `tkrlist`）
+     返回**空 map**，遍历不到任何东西。
+- **正确做法**：
+  ```java
+  for (String usage : dispatcher.getSmartUsage(node, source).values()) {
+      if (usage.startsWith("\"")) continue;               // 跳过根字面量自身
+      usages.add(usage.startsWith(root + " ") || usage.equals(root)
+              ? usage : root + " " + usage);               // 补根名前缀
+  }
+  if (usages.isEmpty()) usages.add(root);                  // 无子节点时回退为指令自身
+  ```
+- **验证方式**：**不需要启动游戏**。本机有 Brigadier jar
+  （`D:\mc-dev-kit\m2repo\com\mojang\brigadier\1.3.10\brigadier-1.3.10.jar`），
+  可以用 `javac` 搭出同样的指令树直接跑，秒级验证输出格式。本项目两个 bug 都是这样定位的。
+- **教训**：凡是「从 Brigadier 树反推用法/帮助文本」的代码，**都要用离线 Brigadier 测**，
+  不要靠读文档猜返回格式。
+
+## P-025 `ResourceLocationArgument.id()` 自带的补全**不限定注册表**，且 1.21.1 没有 `SuggestionProvider` 类
+
+- **现象**（用户反馈）：`/tkrattribute <对象> <属性名> <数值>` 敲到属性名时**按 Tab 没有候选**。
+- **根因**：`ResourceLocationArgument.id()` 的默认补全范围是**所有注册表的 id**，
+  并不会只列出某个注册表里的条目；对「只想补全自己命名空间属性」的场景等于没有可用补全。
+- **另一个易踩点**：1.21.1 **不存在** `net.minecraft.commands.synchronization.SuggestionProvider`
+  这个类（该包下只剩一个遗留的 `ClientSuggestionProvider`）。
+  要用的其实是 **Brigadier 自己的** `com.mojang.brigadier.suggestion.SuggestionProvider`
+  泛型接口，以及 `net.minecraft.commands.SharedSuggestionProvider` 的静态辅助方法。
+- **正确做法**：显式挂一个补全器：
+  ```java
+  import com.mojang.brigadier.suggestion.SuggestionProvider;
+  import net.minecraft.commands.SharedSuggestionProvider;
+
+  private static final SuggestionProvider<CommandSourceStack> SUGGEST_TKR_ATTRIBUTES =
+          (ctx, builder) -> SharedSuggestionProvider.suggestResource(
+                  TkrAttributes.tkrAttributeIds(), builder);
+  // 然后：
+  Commands.argument("attribute", ResourceLocationArgument.id())
+          .suggests(SUGGEST_TKR_ATTRIBUTES)
+  ```
+  候选来源**从注册表动态取**（`BuiltInRegistries.ATTRIBUTE.keySet()` 按命名空间过滤），
+  而不是写死列表，这样以后新增属性会自动出现在补全里。
+- **vanilla 参照**：`BossBarCommands.SUGGEST_BOSS_BAR` 就是这么写的。**找不到 API 时，
+  先在本机 sources jar 里搜一个用同样机制的 vanilla 指令**，比翻文档快得多。
+
+## P-026 指令参数只限制下界 → 非法值写进物品 → 序列化抛异常 → 服务器崩溃
+
+- **现象**（本项目真实崩溃，2026-09-20）：
+  ```
+  已为 力量之刃 赋予力量伤害：系数 9223372036854775807，额值 9223372036854775807
+  ...
+  IllegalStateException: threshold must be within (0, 1.0E20], got 1.0E47;
+                        bonus_ratio must be within (0, 1.0E20], got 1.0E45
+  [Server thread/ERROR] Error saving [1 tkr:strength_blade]
+  [Server thread/FATAL] Game crashed
+  ```
+- **根因（两层）**：
+  1. **指令参数没有上界**。最初写的是 `DoubleArgumentType.doubleArg(0.000001)` ——
+     这个重载**只有下界**，任意大的值都能通过解析并被写进物品组件。
+  2. **组件 codec 却严格校验上界** `(0, ATTRIBUTE_MAX]`。于是物品处于「不可序列化」状态，
+     一旦要存盘或走网络就抛异常。
+- **为什么后果特别严重**：失败发生在 `ItemStack.save` —— 物品**仍留在背包里**，
+  于是每次自动保存都失败刷错误，最终崩溃。
+- **正确做法**：**每个数值参数都要同时给上下界**，且上界与 codec 的校验上界**同源**：
+  ```java
+  final double min = 0.000001;
+  final double max = StrengthConfig.attributeMax();   // 与 codec 同一个常量
+  DoubleArgumentType.doubleArg(min, max)
+  ```
+  这样非法值在**解析阶段**就被 Brigadier 拒掉，根本进不了物品数据。
+- **附带防御**：`原始伤害 + 增量` 在 float 下可能溢出成 `Infinity`。
+  `Infinity` 是合法 float，会被存进存档并污染后续计算，因此也要夹住：
+  ```java
+  double sum = (double) event.getAmount() + bonus;
+  event.setAmount(sum >= Float.MAX_VALUE ? Float.MAX_VALUE : (float) sum);
+  ```
+- **排查插曲（值得记）**：崩溃后我一度认为存档已被污染、准备去改 NBT。**实际读了一次
+  playerdata 才发现磁盘上是合法值** —— 因为失败发生在**保存阶段**，非法值从未写盘。
+  **教训：不要凭「应该坏了」就动手改存档，先实际读出来确认。**
+  工具：`.dsh/tools/nbt_component_tool.py`（纯标准库解析 gzip NBT，可列出所有 TKR 组件值）。
+
 ## P-018 曲线规格经过多轮澄清，极易被后来的会话误解
 
 - **现象**：同一套「力量伤害曲线」在讨论中被反复改写过 —— 横轴一度被当成伤害值（实为力量）、

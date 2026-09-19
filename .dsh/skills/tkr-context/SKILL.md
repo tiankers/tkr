@@ -40,15 +40,15 @@ whenToUse: 当前工作目录是 C:\Users\26461\Desktop\tkr，或任务提到 TK
 
 | 项 | 值 | 来源 |
 |---|---|---|
-| 项目名 / modId | TKR / `tkr` | `gradle.properties` |
-| 作者 / 协议 | tiankers / LGPL-2.1-only | `README.md` |
+| 项目名 / 显示名 | **TKR Lib** / modId `tkr` | `mods.toml: displayName`；`gradle.properties: mod_name` |
+| 作者 / 协议 | tiankers / **LGPL-3.0-only** | `README.md`、`gradle.properties: mod_license` |
 | Minecraft | **1.21.1**（只支持这一个版本） | `gradle.properties: minecraft_version` |
 | NeoForge | **21.1.232** | `gradle.properties: neo_version` |
 | Java | **21**（`options.release = 21`） | `build.gradle` |
 | Gradle | 9.2.1（wrapper，华为云镜像分发） | `gradle/wrapper/gradle-wrapper.properties` |
 | 构建插件 | ModDevGradle `net.neoforged.moddev` 2.0.141 | `build.gradle` |
 | Maven 组 / 版本 | `dev.tkr` / `0.1.0` | `gradle.properties` |
-| 外部依赖 | **仅 Curios `9.5.1+1.21.1`**（`libs/` 本地 jar） | `build.gradle` |
+| 外部依赖 | **无**（Curios 已于 2026-09-19 移除） | `build.gradle` |
 
 > **版本纪律**：本项目是**单版本锁定**的。任何网上抄来的代码，若来自 1.20.x、1.20.1、1.21.4、1.21.5+ 或 Forge（非 NeoForge），都必须先核对 §4 的陷阱清单再落地。NeoForge 21.1.x / MC 1.21.1 与相邻版本之间**存在真实的 API 断裂**，尤其：数据组件、注册表、Curios、渲染管线。
 
@@ -78,7 +78,7 @@ whenToUse: 当前工作目录是 C:\Users\26461\Desktop\tkr，或任务提到 TK
 
 | 层 | 路径 | 可依赖 | 绝对禁止 |
 |---|---|---|---|
-| 契约层 | `dev/tkr/api/` | JDK、原版/NeoForge 公共 API、Curios 公共 API | 另外三层 |
+| 契约层 | `dev/tkr/api/` | JDK、原版/NeoForge 公共 API | 另外三层 |
 | 定义层 | `dev/tkr/data/` | `api` | `client`；尽量避免 `logic` |
 | 逻辑层 | `dev/tkr/logic/` | `api`、`data` | **任何 `client` 或 `net.minecraft.client.*`** |
 | 表现层 | `dev/tkr/client/` | 前三层 | 无（依赖链末端） |
@@ -96,7 +96,7 @@ whenToUse: 当前工作目录是 C:\Users\26461\Desktop\tkr，或任务提到 TK
 完整清单与根因见 `.dsh/memory/PITFALLS.md`。以下是最容易犯的：
 
 1. **属性 id 在 1.21.1 带前缀，不是裸名。** 真实注册名是 `generic.max_health`、`player.block_break_speed`、`zombie.spawn_reinforcements`（编译产物 `Attributes.class` 常量池已核验）；翻译键是 `attribute.name.generic.max_health`。**扁平化（去掉 `generic.`）是更晚的版本才发生的** —— 网上大量资料按新版本写法给出裸名，照抄会拿到错误的注册名。
-2. **Curios 是 9.x，不是 1.20.1 时代的 5.x。** 物品接口、槽位注册、属性修饰符 API 都已变更。**一律以 `references/curios-9.5.1-api.md` 为准。**
+2. **1.21.1 的平台 API 与相邻版本存在真实断裂。** 数据组件、注册表、渲染管线都改过；网上教程若来自 1.20.x / 1.21.4+ / Forge，照抄会编译失败或行为不符。
 3. **依赖版本区间不可推理，只能实跑验证。** FML 的 `versionRange` 解析与 Maven **不同构**，本机又**没有** FML 的比较器（属 launcher，不在 merged jar 内），所以离线复现不了。实测证据：Maven 下 `[1.21.1-93-NEOFORGE,)` 判**满足** `1.21.1-93-NEOFORGE`，而纯数字下界 `[93,)` 判**不满足** —— 本仓库曾据此给错建议（见 `PITFALLS.md` P-001 修正记录）。**有运行时证据通过的区间不要动**；当前 `curios` 的 `[9.5.1+1.21.1]` 已实测通过，维持原样。
 4. **1.21 起物品/方块用数据组件（DataComponent），不是 `CompoundTag` 裸写 NBT。** 属性/附魔等都在组件上。
 5. **注册一律走 `DeferredRegister` + `RegisterEvent`**，不要用已废弃的静态注册或 `@Mod.EventBusSubscriber` 旧写法。属性的目标注册表是 **`BuiltInRegistries.ATTRIBUTE`**（`Attributes` 只是持有 `Holder<Attribute>` 的门面类）。
@@ -114,7 +114,7 @@ whenToUse: 当前工作目录是 C:\Users\26461\Desktop\tkr，或任务提到 TK
 | `mc-1.21.1-attributes.tsv` | 1.21.1 **全部**原版属性：id、英/中文名、默认值、取值范围、官方描述（本版本为空）、翻译键。**机器生成，不要手改。** | `build/moddev/artifacts/neoforge-21.1.232-sources.jar` 的 `Attributes.java` + `minecraft_1.21.1_client.jar` 的 `en_us.json` + assetIndex `17.json` 指向的 `zh_cn.json` |
 | `mc-1.21.1-attributes.merged.tsv` | 上述 TSV 叠加**手工撰写**的中文简介与来源列，是 xlsx 的直接数据源 | 同上 + 本项目手工简介 |
 | `_raw-attributes-notes.md` | 属性提取口径、注册代码片段、孤儿键与异常项 | 同上 |
-| `curios-9.5.1-api.md` | Curios 9.5.1 真实签名、槽位注册机制、客户端边界、5.x→9.x 迁移陷阱 | `libs/curios-neoforge-9.5.1+1.21.1.jar`（`javap`） |
+| `curios-9.5.1-api.md` | **⚠️ 历史资料**：Curios 9.5.1 的真实签名（依赖已于 2026-09-19 移除，本项目不再使用） | 曾是 `libs/curios-neoforge-9.5.1+1.21.1.jar`（`javap`，jar 已删除） |
 | `item-components-1.21.1.md` | **物品堆叠与数据组件**：堆叠上限/耐久硬校验、57 个组件清单与旧 NBT 对照表、「不用 NBT」的落地写法、组件注册 API | `neoforge-21.1.232-sources.jar` 的 `DataComponents.java`、`DataComponentType.java`、`Item.java`、`DeferredRegister.java` |
 | `mc-1.21.1-item-components.tsv` | 全部 **57 个**原版物品组件：id、手工命名（英/中）、Java 类型、是否落盘、是否显式同步、简介、来源。**机器生成，不要手改。** | 同上 + `DataComponents.class` 常量池交叉验证 |
 | `strength-spec.md` | **力量属性最终规格**：伤害曲线公式与数值表、耐久规则、力量下限组件、挂载点、代码位置、已否决方案。**改动力量机制前必读。** | 用户多轮澄清后的定稿 + 源码核验 |
